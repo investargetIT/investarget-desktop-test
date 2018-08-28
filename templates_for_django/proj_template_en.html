@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>多维海拓 Investarget</title>
+    <link rel="shortcut icon" href="/static/image/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <style>
+        .info-container {
+            overflow: auto;
+            line-height: 24px;
+        }
+    
+        .info-label {
+            float: left;
+            width: 100px;
+            text-align: right;
+        }
+    
+        .info-content {
+            margin-left: 120px;
+        }
+    </style>
+</head>
+<body style="margin: 0">
+    <div class="ant-layout">
+        <div class="ant-layout-content" style="background: rgb(255, 255, 255);margin: 0px; min-height: 280px;">
+            
+            <div style="padding-left: 20px; background: rgb(0, 95, 175); color: white; line-height: 84px">
+                <h1 style="margin: 0;font-family: sans-serif;font-size: 24px;font-weight: 200">{{ project.projtitleE }}</h1>
+            </div>
+
+            <div style="margin-top: 20px;overflow: auto">
+
+                <div style="float: left">
+
+                    <div class="info-container">
+                        <div class="info-label">Type of Transaction</div>
+                        <div class="info-content">{{ project.transactionType.0.nameE }}</div>
+                    </div>
+
+                    <div class="info-container">
+                        <div class="info-label">Industry</div>
+                        <div class="info-content">{{ project.industries.0.nameE }}</div>
+                    </div>
+
+                    <div class="info-container">
+                        <div class="info-label">Region</div>
+                        <div class="info-content">{{ project.country.countryE }}</div>
+                    </div>
+
+                    <div class="info-container">
+                        <div class="info-label">TransactionSize</div>
+                        <div class="info-content">$ {{ project.financeAmount_USD }}</div>
+                    </div>
+
+                    <div class="info-container">
+                        <div class="info-label">Post Money Valuation</div>
+                        <div class="info-content">$ {{ project.companyValuation_USD }}</div>
+                    </div>
+
+                    <div class="info-container">
+                        <div class="info-label">Engagement in Transaction</div>
+                        <div class="info-content">{{ project.character.characterE }}</div>
+                    </div>
+
+                </div>
+            
+                <div style="float: right;position: relative;">
+                    <img src="{{ project.industries.0.url }}" style="width: 400px; height: 225px;">
+                    <div style="position: absolute;top: 10px;left: 10px">
+                        {% for tag in project.tags %}
+                        <div data-show="true" class="ant-tag ant-tag-orange">
+                            <span class="ant-tag-text">{{ tag.nameE }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+            </div>
+
+            <div>
+                <h3>Project Profile</h2>
+                <p>{{ project.p_introducteE }}</p>
+            </div>
+
+            {% if project.targetMarketE != None %}
+            <div>
+                <h3>Target Market</h3>
+                <p>
+                    {{ project.targetMarketE }}
+                </p>
+            </div>
+            {%  endif %}
+
+            {% if project.productTechnologyE != None %}
+            <div>
+                <h3>Product/Technology</h3>
+                <p>
+                    {{ project.productTechnologyE }}
+                </p>
+            </div>
+            {%  endif %}
+
+            {% if project.businessModelE != None %}
+            <div>
+                <h3>Business Model</h3>
+                <p>
+                    {{ project.businessModelE }}
+                </p>
+            </div>
+            {%  endif %}
+
+            {% if project.brandChannelE != None %}
+            <div>
+                <h3>Brand Channel</h3>
+                <p>
+                    {{ project.brandChannelE }}
+                </p>
+            </div>
+            {%  endif %}
+
+            {% if project.managementTeamE != None %}
+            <div>
+                <h3>Management Team</h3>
+                <p>{{ project.managementTeamE }}</p>
+            </div>
+            {%  endif %}
+
+            {% if project.BusinesspartnersE != None %}
+            <div>
+                <h3>Business Partners</h3>
+                <p>{{ project.BusinesspartnersE }}</p>
+            </div>
+            {%  endif %}
+
+            {% if project.useOfProceedC != None %}
+            <div>
+                <h3>Use of Proceeds</h3>
+                <p>{{ project.useOfProceedC }}</p>
+            </div>
+            {%  endif %}
+
+            {% if project.financingHistoryE != None %}
+            <div>
+                <h3>Financing History</h3>
+                <p>{{ project.financingHistoryE }}</p>
+            </div>
+            {%  endif %}
+            
+            {% if project.operationalDataE != None %}
+            <div>
+                <h3>Operational Data</h3>
+                <p>{{ project.operationalDataE }}</p>
+            </div>
+            {%  endif %}
+
+
+                <div>
+                    <h3>Financials</h3>
+
+                    <div style="display: flex;">
+                            <div style="font-weight: bolder">USD</div>
+                            {% for item in finance %}
+                            <div>$ {{ item.fYear }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div style="height: 2px;background: rgb(0, 95, 175);"></div>
+
+                        <div style="display: flex">
+                                <div style="font-weight: bolder">Revenue</div>
+                                {% for item in finance %}
+                                <div>$ {{ item.revenue_USD }}</div>
+                                {% endfor %}
+                            </div>
+
+
+                                <div style="display: flex;"><span style="width: 150px;">Profits(USD)</span><span>$ {{ item.netIncome_USD }}</span></div>
+                                <div style="display: flex;"><span style="width: 150px;">Gross Profits(USD)</span><span>$ {{ item.grossProfit }}</span></div>
+                                <div style="display: flex;"><span style="width: 150px;">Total Assets(USD)</span><span>$ {{ item.totalAsset }}</span></div>
+                                <div style="display: flex;"><span style="width: 150px;">Net Assets(USD)</span><span>$ {{ item.stockholdersEquity }}</span></div>
+                                <div style="display: flex;"><span style="width: 150px;">Net Cash Flow(USD)</span><span>$ {{ item.grossMerchandiseValue }}</span></div>
+                                <div style="display: flex;"><span style="width: 150px;">Operating Cash Flow(USD)</span><span>$ {{ item.operationalCashFlow }}</span></div>
+                                <div style="display: flex;"><span style="width: 150px;">EBITDA(USD)</span><span>$ {{ item.EBITDA }}</span></div>
+
+                                <div style="height: 1px;background: rgb(0, 95, 175);"></div>
+                </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
