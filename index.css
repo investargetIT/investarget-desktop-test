@@ -19059,6 +19059,30 @@ li.ant-tree-treenode-disabled > .ant-tree-node-content-wrapper:hover {
      text-overflow: ellipsis;
   white-space: nowrap;
 }
+.event-type-1___1d6mI {
+  background-color: rgb(230, 168, 47);
+  margin-bottom: 2px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.event-type-2___QVjly {
+  background-color: rgb(66, 175, 149);
+  margin-bottom: 2px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.event-type-3___3DyS- {
+  background-color: rgb(95, 163, 246);
+  margin-bottom: 2px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .event___3YdTM:hover {
   background-color: #FFF9C4;
 }
