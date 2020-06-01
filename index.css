@@ -10778,7 +10778,118 @@ textarea.ant-input {
 .ant-input-affix-wrapper .ant-input {
   min-height: 100%;
 }
-/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+.head___RAz6M {
+  width: 100%;
+min-width: 1200px;
+  height: 120px;
+  /* background-image: linear-gradient(0deg, rgba(255, 255, 255, 0.52) 0%, #FFFFFF 83%); */
+  background-color: rgba(225,225,225,0.7);
+position: absolute;
+left: 0;
+top: 0;
+z-index: 999;
+}
+
+.logoHead___2lQ52 {
+  margin: 10px 0;
+}
+
+.headText____uLm_ {
+  line-height: 109px;
+}
+
+.headText____uLm_ li {
+  margin: 0 1%;
+}
+
+.headText____uLm_ li a {
+  text-decoration: none;
+  color: black;
+}
+
+.loginImg___1k3nH {
+  width: 96px;
+  cursor: pointer;
+}
+
+.textT___2OyRL {
+  font-size: 12px;
+  color: #333;
+}
+
+.textLine___1VKST {
+  margin: 0 5px;
+}
+
+.textCh___3Thob,
+.textEnglish___1hHlR {
+  cursor: pointer;
+}
+
+.disabled___3qP3_ {
+  color: rgba(116, 116, 116, 1);
+  cursor: not-allowed;
+}
+
+.row___3oZgH {
+  margin: 0;
+}
+.row01___Vbaug {
+  width: 1200px;
+  margin: auto !important;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+.content___2PAhA {
+  position: relative;
+}
+
+.content___2PAhA img {
+  width: 100%;
+}
+
+.dg___2W4T8 {
+  display: block;
+  position: absolute;
+  top: 15%;
+}
+
+.modal-header___29p-a {
+  border-bottom: none;
+}
+
+.modal-footer___hyOXY {
+  border-top: none;
+}
+
+.form-group___2TJlt {
+  margin-bottom: 0;
+}
+
+.form-control___fNTu7 {
+  display: inline-block;
+  margin: 10px 0;
+  background: #F0F0F0;
+  padding: 5px 20px;
+}
+
+@media (min-width: 768px) {
+  .modal-dialog___2F1JO {
+      width: 500px;
+  }
+}
+
+.modal-body___3v_wm {
+  width: 60%;
+  margin: 0 auto;
+}/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
 /* stylelint-disable declaration-bang-space-before */
 /* stylelint-disable declaration-bang-space-before */
 .ant-pagination {
