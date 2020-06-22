@@ -19876,7 +19876,7 @@ li.ant-tree-treenode-disabled > .ant-tree-node-content-wrapper:hover {
   white-space: nowrap;
 }
 .event-type-4___3o1iA {
-  background-color: #EF5350;
+  /* background-color: #EF5350; */
   margin-bottom: 2px;
   overflow: hidden;
   -o-text-overflow: ellipsis;
