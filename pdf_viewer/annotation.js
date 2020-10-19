@@ -76,28 +76,28 @@ const saveAnnotationsToLocalStorage = async (documentId) => {
 
 saveAnnotationsToLocalStorage(documentId);
 
-const myStoreAdapter = new PDFJSAnnotate.StoreAdapter({
-  getAnnotations(documentId, pageNumber) {
-    return getAnnotationsForAdapter(documentId, pageNumber);
-  },
-  addAnnotation(documentId, pageNumber, annotation) {
-    return addAnnotationReq(documentId, pageNumber, annotation);
-  },
-  getComments() {
-    return new Promise((resolve) => {
-      return resolve([]);
-    });
-  },
-  // getAnnotation(documentId, annotationId) {/* ... */},
+// const myStoreAdapter = new PDFJSAnnotate.StoreAdapter({
+//   getAnnotations(documentId, pageNumber) {
+//     return getAnnotationsForAdapter(documentId, pageNumber);
+//   },
+//   addAnnotation(documentId, pageNumber, annotation) {
+//     return addAnnotationReq(documentId, pageNumber, annotation);
+//   },
+//   getComments() {
+//     return new Promise((resolve) => {
+//       return resolve([]);
+//     });
+//   },
+//   // getAnnotation(documentId, annotationId) {/* ... */},
 
-  // editAnnotation(documentId, pageNumber, annotation) {/* ... */},
+//   // editAnnotation(documentId, pageNumber, annotation) {/* ... */},
 
-  // deleteAnnotation(documentId, annotationId) {/* ... */},
+//   // deleteAnnotation(documentId, annotationId) {/* ... */},
   
-  // addComment(documentId, annotationId, content) {/* ... */},
+//   // addComment(documentId, annotationId, content) {/* ... */},
 
-  // deleteComment(documentId, commentId) {/* ... */}
-});
+//   // deleteComment(documentId, commentId) {/* ... */}
+// });
 
 // PDFJSAnnotate.setStoreAdapter(myStoreAdapter);
 PDFJSAnnotate.setStoreAdapter(new PDFJSAnnotate.LocalStoreAdapter());
@@ -126,7 +126,7 @@ const loadAllComments = async function () {
         </div>
       </div>`;
     }
-    return `<div class="comment-container" data-annotation-uuid="${annotationId}" data-annotation-system-id="${systemId}">
+    return `<div class="comment-container" data-annotation-uuid="${annotationId}" data-annotation-system-id="${systemId}" data-annotation-page="${page}">
       <div class="comment-page">Page ${page}</div>
       <div class="comment-wrapper">
         <img class="comment-author-avatar" src="${user.photourl}" />
@@ -187,6 +187,12 @@ const loadAllComments = async function () {
     if (target) {
       UI.createEditOverlay(target);
     }
+  });
+
+  // 点击页码跳转到相应页面
+  $('.comment-page').click(function() {
+    const annotationPage = $(this).parents('.comment-container').attr('data-annotation-page');
+    PDFViewerApplication.pdfViewer.scrollPageIntoView({ pageNumber: parseInt(annotationPage) });
   });
 
   // 回复评论
@@ -280,6 +286,16 @@ function disableRectangle() {
   $('#annotation-rectangle').removeClass('toggled');
   UI.disableRect();
 }
+function enablePen() {
+  $('#annotation-pen').addClass('toggled');
+  $('.custom-annotation-layer').css('zIndex', 1);
+  UI.enablePen();
+}
+function disablePen() {
+  $('#annotation-pen').removeClass('toggled');
+  $('.custom-annotation-layer').css('zIndex', 0);
+  UI.disablePen();
+}
 function enableHighlight() {
   $('#annotation-highlight').addClass('toggled');
   UI.enableRect('highlight');
@@ -301,6 +317,7 @@ $('#annotation-select').click(function() {
   disableRectangle();
   disableHighlight();
   disablePoint();
+  disablePen();
   if ($('#annotation-select').hasClass('toggled')) {
     disableEdit();
   } else {
@@ -312,6 +329,7 @@ $('#annotation-rectangle').click(function() {
   disableEdit();
   disableHighlight();
   disablePoint();
+  disablePen();
   if ($('#annotation-rectangle').hasClass('toggled')) {
     disableRectangle();
   } else {
@@ -323,6 +341,7 @@ $('#annotation-highlight').click(function() {
   disableEdit();
   disableRectangle();
   disablePoint();
+  disablePen();
   if ($('#annotation-highlight').hasClass('toggled')) {
     disableHighlight();
   } else {
@@ -330,10 +349,23 @@ $('#annotation-highlight').click(function() {
   }
 });
 
+$('#annotation-pen').click(function() {
+  disableEdit();
+  disableRectangle();
+  disablePoint();
+  disableHighlight();
+  if ($('#annotation-pen').hasClass('toggled')) {
+    disablePen();
+  } else {
+    enablePen();
+  }
+});
+
 $('#annotation-comment').click(function() {
   disableEdit();
   disableRectangle();
   disableHighlight();
+  disablePen();
   if ($('#annotation-comment').hasClass('toggled')) {
     $('#annotation-comment').removeClass('toggled');
   } else {
@@ -361,10 +393,14 @@ $('#annotation-rectangle').hover(function() {
 
 UI.addEventListener('annotation:add', (documentId, pageNumber, annotation) => {
   console.log('Annotation added', documentId, pageNumber, annotation);
-  if (annotation.type === 'point') {
-    setTimeout(() => {
-      loadAllComments()
-    }, 1000);
+  // if (annotation.type === 'point') {
+  //   setTimeout(() => {
+  //     loadAllComments()
+  //   }, 1000);
+  //   return;
+  // }
+  if (annotation.type === 'drawing') {
+    addAnnotationReq(documentId, pageNumber, annotation)
     return;
   }
   $('#add-comment-form').data('formAnnotation', { documentId, pageNumber, annotation });
@@ -464,7 +500,7 @@ const getAnnotationsForAdapter = async (documentId, pageNumber) => {
   return { annotations, documentId, pageNumber };
 }
 
-const addAnnotationReq = async (documentId, pageNumber, annotation, comment) => {
+const addAnnotationReq = async (documentId, pageNumber, annotation, comment = '') => {
   console.log('document id', documentId);
   console.log('page number', pageNumber);
   console.log('annotation', annotation);
@@ -590,16 +626,16 @@ const deleteAnnotationReq = async id => {
   }
 }
 
-const testAnnotation = {
-  class: "Annotation",
-  height: 52.2,
-  page: 1,
-  type: "area",
-  uuid: "d76646cb-d364-46d8-9983-56a4c88fd3b5",
-  width: 87.00000000000003,
-  x: 84.04545454545455,
-  y: 36.13636363636365,
-};
+// const testAnnotation = {
+//   class: "Annotation",
+//   height: 52.2,
+//   page: 1,
+//   type: "area",
+//   uuid: "d76646cb-d364-46d8-9983-56a4c88fd3b5",
+//   width: 87.00000000000003,
+//   x: 84.04545454545455,
+//   y: 36.13636363636365,
+// };
 
 // getAnnotations(documentId, 1);
 
