@@ -2011,8 +2011,6 @@ function webViewerInitialized() {
   PDFViewerApplication.eventBus.on('pagerendered', function(e) {
     var ctx = e.source.canvas.getContext('2d');
     drawWatermark(ctx, WATER_MARK, ORG); // 记事：WATER_MARK 写错城 WATERMARK 导致 disableTextLayer 失效
-    console.log('page rendered', e); // we have viewport here
-    window.drawAnnotationLayer(e);
   });
 
 }
@@ -7142,8 +7140,7 @@ var SidebarView = {
   NONE: 0,
   THUMBS: 1,
   OUTLINE: 2,
-  ATTACHMENTS: 3,
-  COMMENTS: 4,
+  ATTACHMENTS: 3
 };
 
 var PDFSidebar = function () {
@@ -7166,11 +7163,9 @@ var PDFSidebar = function () {
     this.thumbnailButton = options.thumbnailButton;
     this.outlineButton = options.outlineButton;
     this.attachmentsButton = options.attachmentsButton;
-    this.commentsButton = options.commentsButton;
     this.thumbnailView = options.thumbnailView;
     this.outlineView = options.outlineView;
     this.attachmentsView = options.attachmentsView;
-    this.commentsView = options.commentsView;
     this.disableNotification = options.disableNotification || false;
     this.l10n = l10n;
     this._addEventListeners();
@@ -7184,7 +7179,6 @@ var PDFSidebar = function () {
       this.switchView(SidebarView.THUMBS);
       this.outlineButton.disabled = false;
       this.attachmentsButton.disabled = false;
-      this.commentsButton.disabled = false;
     }
   }, {
     key: 'setInitialView',
@@ -7219,11 +7213,9 @@ var PDFSidebar = function () {
           this.thumbnailButton.classList.add('toggled');
           this.outlineButton.classList.remove('toggled');
           this.attachmentsButton.classList.remove('toggled');
-          this.commentsButton.classList.remove('toggled');
           this.thumbnailView.classList.remove('hidden');
           this.outlineView.classList.add('hidden');
           this.attachmentsView.classList.add('hidden');
-          this.commentsView.classList.add('hidden');
           if (this.isOpen && isViewChanged) {
             this._updateThumbnailViewer();
             shouldForceRendering = true;
@@ -7236,11 +7228,9 @@ var PDFSidebar = function () {
           this.thumbnailButton.classList.remove('toggled');
           this.outlineButton.classList.add('toggled');
           this.attachmentsButton.classList.remove('toggled');
-          this.commentsButton.classList.remove('toggled');
           this.thumbnailView.classList.add('hidden');
           this.outlineView.classList.remove('hidden');
           this.attachmentsView.classList.add('hidden');
-          this.commentsView.classList.add('hidden');
           break;
         case SidebarView.ATTACHMENTS:
           if (this.attachmentsButton.disabled) {
@@ -7249,24 +7239,9 @@ var PDFSidebar = function () {
           this.thumbnailButton.classList.remove('toggled');
           this.outlineButton.classList.remove('toggled');
           this.attachmentsButton.classList.add('toggled');
-          this.commentsButton.classList.remove('toggled');
           this.thumbnailView.classList.add('hidden');
           this.outlineView.classList.add('hidden');
-          this.commentsView.classList.add('hidden');
           this.attachmentsView.classList.remove('hidden');
-          break;
-        case SidebarView.COMMENTS:
-          if (this.commentsButton.disabled) {
-            return;
-          }
-          this.thumbnailButton.classList.remove('toggled');
-          this.outlineButton.classList.remove('toggled');
-          this.attachmentsButton.classList.remove('toggled');
-          this.commentsButton.classList.add('toggled');
-          this.thumbnailView.classList.add('hidden');
-          this.outlineView.classList.add('hidden');
-          this.attachmentsView.classList.add('hidden');
-          this.commentsView.classList.remove('hidden');
           break;
         default:
           console.error('PDFSidebar_switchView: "' + view + '" is an unsupported value.');
@@ -7437,9 +7412,6 @@ var PDFSidebar = function () {
       this.attachmentsButton.addEventListener('click', function () {
         _this3.switchView(SidebarView.ATTACHMENTS);
       });
-      this.commentsButton.addEventListener('click', function () {
-        _this3.switchView(SidebarView.COMMENTS);
-      })
       this.eventBus.on('outlineloaded', function (evt) {
         var outlineCount = evt.outlineCount;
         _this3.outlineButton.disabled = !outlineCount;
@@ -9858,11 +9830,9 @@ function getViewerConfiguration() {
       thumbnailButton: document.getElementById('viewThumbnail'),
       outlineButton: document.getElementById('viewOutline'),
       attachmentsButton: document.getElementById('viewAttachments'),
-      commentsButton: document.getElementById('viewComments'),
       thumbnailView: document.getElementById('thumbnailView'),
       outlineView: document.getElementById('outlineView'),
-      attachmentsView: document.getElementById('attachmentsView'),
-      commentsView: document.getElementById('commentsView')
+      attachmentsView: document.getElementById('attachmentsView')
     },
     findBar: {
       bar: document.getElementById('findbar'),
