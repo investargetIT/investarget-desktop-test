@@ -13,7 +13,6 @@ const baseUrl = 'http://apitest.investarget.com';
 let submitComment = false;
 let isReply = false;
 
-// TODO: get all annotations adding page_size
 const getAnnotationsReq = async (documentId) => {
   const user = getUserInfo()
   if (!user) {
@@ -76,6 +75,32 @@ const saveAnnotationsToLocalStorage = async (documentId) => {
 
 saveAnnotationsToLocalStorage(documentId);
 
+
+const getSignatureFromAnnotation = allAnnotation => {
+  const signatureAnnotations = allAnnotation.filter(f => f.question === '');
+  const pageSignatureAnnotations = signatureAnnotations.map(m => {
+    const { location } = m;
+    const originalAnnotation = JSON.parse(location);
+    const { page, uuid } = originalAnnotation;
+    return { ...m, page, uuid };
+  });
+  const result = [];
+  for (let index = 0; index < pageSignatureAnnotations.length; index++) {
+    const element = pageSignatureAnnotations[index];
+    const { page } = element;
+    const pageIndex = result.map(m => m.page).indexOf(page);
+    if (pageIndex === -1) {
+      const { asktime, createdtime, id, user, uuid } = element;
+      result.push({ type: 'signature', asktime, createdtime, id: id.toString(), user, page, annotations: [element], uuid: uuid.toString() });
+    } else {
+      result[pageIndex].id += `,${element.id}`;
+      result[pageIndex].uuid += `,${element.uuid}`;
+      result[pageIndex].annotations.push(element);
+    }
+  }
+  return result;
+}
+
 // const myStoreAdapter = new PDFJSAnnotate.StoreAdapter({
 //   getAnnotations(documentId, pageNumber) {
 //     return getAnnotationsForAdapter(documentId, pageNumber);
@@ -101,6 +126,13 @@ saveAnnotationsToLocalStorage(documentId);
 
 // PDFJSAnnotate.setStoreAdapter(myStoreAdapter);
 PDFJSAnnotate.setStoreAdapter(new PDFJSAnnotate.LocalStoreAdapter());
+
+hideSignatureForTrader = () => {
+  setTimeout(() => {
+    const element = '3efd45ee-a2e5-425d-ad8d-b67dbe6a10ae';
+    $(`[data-pdf-annotate-uuid="${element}"]`).hide();
+  }, 100);
+};
 
 const loadAllComments = async function () {
   const generateSingleComment = function (annotation) {
@@ -143,29 +175,62 @@ const loadAllComments = async function () {
       </div>
     </div>`
   };
+
+  const generateSignature = function (annotation) {
+    const {
+      uuid: annotationId,
+      page,
+      user,
+      asktime,
+      id: systemId,
+    } = annotation;
+    return `<div class="comment-container" data-annotation-system-id="${systemId}" data-annotation-uuid="${annotationId}" data-annotation-page="${page}">
+      <div class="comment-page">Page ${page}</div>
+      <div class="comment-wrapper">
+        <img class="comment-author-avatar" src="${user.photourl}" />
+        <div class="comment-right">
+          <div class="comment-time">签名于 ${asktime.slice(0, 16).replace('T', ' ')}</div>
+          <div class="comment-author-name">${user.username}</div>
+        </div>
+      </div>
+      <div class="comment-actions">
+        <img class="comment-actions__icon comment-actions__display" src="/pdf_viewer/images/annotationBarButton-visible.png" />
+        <img class="comment-actions__icon comment-actions__hide" src="/pdf_viewer/images/annotationBarButton-hide.png" />
+      </div>
+    </div>`
+  };
+
   const commentsView = document.getElementById('commentsView');
-  // const annotationStr = localStorage.getItem(`${documentId}/annotations`);
-  // const allAnnotations = JSON.parse(annotationStr);
   const allAnnotations = await getAnnotationsReq(documentId);
-  console.log('all annotations', allAnnotations);
+
+  const allSignature = getSignatureFromAnnotation(allAnnotations);
+
   let annotationComments = [];
   if (allAnnotations) {
-    // annotationComments = allAnnotations.filter(f => f.class === 'Annotation');
     annotationComments = allAnnotations.filter(f => f.location).map(m => {
       const { location } = m;
       const annotation = JSON.parse(location);
       const { page, uuid } = annotation;
-      return { ...m, page, uuid };
+      return { ...m, page, uuid, type: 'question' };
     });
-    // annotationComments = annotationComments.map(m => {
-    //   const comments = allAnnotations.filter(f => f.class === 'Comment' && f.annotation === m.uuid);
-    //   return { ...m, comments };
-    // });
   }
-  console.log('annotation comments', annotationComments);
-  const commentsHTML = annotationComments.filter(f => f.question && f.page)
-    .map(m => generateSingleComment(m))
-    .reduce((previous, current) => previous + current, '');
+  annotationComments = annotationComments.filter(f => f.question && f.page);
+
+  const allSidebarContent = allSignature.concat(annotationComments);
+  console.log('all sidebar content', allSidebarContent);
+  allSidebarContent.sort(function(a, b) {
+    return new Date(b.createdtime) - new Date(a.createdtime);
+  });
+
+  const commentsHTML = allSidebarContent.map(m => {
+    if (m.type === 'question') {
+      return generateSingleComment(m);
+    } else if (m.type === 'signature') {
+      return generateSignature(m);
+    } else {
+      return '';
+    }
+  }).reduce((previous, current) => previous + current, '');
   if (commentsHTML) {
     setTimeout(() => {
       window.PDFViewerApplication.pdfSidebar.open();
@@ -173,6 +238,8 @@ const loadAllComments = async function () {
     }, 1000);
   }
   commentsView.innerHTML = commentsHTML;
+  
+  hideSignatureForTrader();
 
   $('.comment-container').click(function() {
 
@@ -244,6 +311,40 @@ const loadAllComments = async function () {
       });
     });
     // After that delete the annotation
+    return false;
+  });
+
+   // 隐藏签名 
+   $('.comment-actions__hide').click(function() {
+    UI.disableEdit();
+
+    const annotationUUID = $(this).parents('.comment-container').attr('data-annotation-uuid');
+    const uuidArray = annotationUUID.split(',');
+    for (let index = 0; index < uuidArray.length; index++) {
+      const element = uuidArray[index];
+      $(`[data-pdf-annotate-uuid="${element}"]`).hide();
+    }
+    
+    $(this).hide();
+    $(this).siblings('.comment-actions__display').show();
+    
+    return false;
+  });
+
+  // 显示签名 
+  $('.comment-actions__display').click(function () {
+    UI.disableEdit();
+
+    const annotationUUID = $(this).parents('.comment-container').attr('data-annotation-uuid');
+    const uuidArray = annotationUUID.split(',');
+    for (let index = 0; index < uuidArray.length; index++) {
+      const element = uuidArray[index];
+      $(`[data-pdf-annotate-uuid="${element}"]`).show();
+    }
+
+    $(this).hide();
+    $(this).siblings('.comment-actions__hide').show();
+
     return false;
   });
 }
