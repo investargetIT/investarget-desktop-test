@@ -310,6 +310,9 @@ th {
   background-color: #eee;
   color: #555;
 }
+.ant-collapse > .investarget-custom-panel.ant-collapse-item > .ant-collapse-header .arrow {
+  top: 10px;
+}
 /* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
 /* stylelint-disable declaration-bang-space-before */
 /* stylelint-disable declaration-bang-space-before */
